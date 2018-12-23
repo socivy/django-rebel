@@ -1,0 +1,4 @@
+django>=2.0,<=2.2
+requests==2.21
+psycopg2==2.7
+premailer==3.2.0
