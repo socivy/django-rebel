@@ -57,7 +57,7 @@ REBEL = {
     "EMAIL_PROFILES": {
         'MARKETING': {
             'EMAIL': "anyone@example.com",
-            'FULL_NAME': 'Sude Engin',
+            'FULL_NAME': 'Example Name',
             "API": {
                 "API_KEY": "",
                 "DOMAIN": "mg.example.com"
