@@ -4,10 +4,14 @@ See:
 https://packaging.python.org/en/latest/distributing.html
 https://github.com/pypa/sampleproject
 """
+import shutil
+import sys
 
+import re
 from setuptools import setup, find_packages
 from codecs import open
 from os import path
+import os
 
 try:
     from pip.req import parse_requirements
@@ -30,6 +34,17 @@ def get_requirements(requirements_file):
     return requirements
 
 
+def get_version(package):
+    """
+    Return package version as listed in `__version__` in `init.py`.
+    """
+    init_py = open(os.path.join(package, '__init__.py')).read()
+    return re.search("__version__ = ['\"]([^'\"]+)['\"]", init_py).group(1)
+
+
+version = get_version('django_rebel')
+
+
 if __name__ == "__main__":
     INSTALL_REQUIRES = get_requirements(path.join(here, "requirements", "requirement-main.txt"))
     TESTING_REQUIRES = get_requirements(path.join(here, "requirements", "requirement-main.txt"))
@@ -37,6 +52,21 @@ if __name__ == "__main__":
     # Get the long description from the README file
     with open(path.join(here, 'README.MD'), encoding='utf-8') as f:
         long_description = f.read()
+
+
+if sys.argv[-1] == 'publish':
+    if os.system("pip freeze | grep twine"):
+        print("twine not installed.\nUse `pip install twine`.\nExiting.")
+        sys.exit()
+    os.system("python setup.py sdist bdist_wheel")
+    os.system("twine upload dist/*")
+    print("You probably want to also tag the version now:")
+    print("  git tag -a %s -m 'version %s'" % (version, version))
+    print("  git push --tags")
+    shutil.rmtree('dist')
+    shutil.rmtree('build')
+    shutil.rmtree('django_rebel.egg-info')
+    sys.exit()
 
 
 setup(
