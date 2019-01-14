@@ -36,8 +36,8 @@ class MailQuerySet(models.QuerySet):
 
 
 class Mail(TimeBasedModel):
-    email_from = models.CharField(max_length=256)
-    email_to = models.CharField(max_length=256)
+    email_from = models.CharField(max_length=256, db_index=True)
+    email_to = models.CharField(max_length=256, db_index=True)
     message_id = models.CharField(max_length=256)
 
     profile = models.CharField(max_length=32)
