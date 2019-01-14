@@ -3,7 +3,17 @@ from django.contrib import admin
 from django.contrib.admin.templatetags.admin_list import _boolean_icon
 from django.utils.html import format_html
 
+from django_rebel.paginator import LargeListPaginator
 from .models import Mail, MailContent, Event, MailLabel
+
+
+class LargeListAdminMixin:
+    max_num_pages = 100
+    paginator = LargeListPaginator
+    show_full_result_count = False
+
+    def get_paginator(self, request, queryset, per_page, orphans=0, allow_empty_first_page=True):
+        return self.paginator(self.max_num_pages, queryset, per_page, orphans, allow_empty_first_page)
 
 
 class EventInlineAdmin(admin.StackedInline):
@@ -117,10 +127,10 @@ class ProfileFilter(admin.SimpleListFilter):
         return queryset.all()
 
 
-class MailAdmin(admin.ModelAdmin):
+class MailAdmin(LargeListAdminMixin, admin.ModelAdmin):
     list_display = ("id", "label", "owner_link", "email_to", "created_at", "tags", "profile",
                     "has_delivered", "has_opened", "has_clicked")
-    search_fields = ("email_from__exact", "email_to__exact", "tags",)
+    search_fields = ("email_from__exact", "email_to__exact",)
     inlines = [EventInlineAdmin, MailContentInline]
     readonly_fields = ("message_id", "email_from", "email_to", "profile", "label", "tags",
                        "created_at", "has_delivered", "has_opened", "has_clicked", "storage_url")
