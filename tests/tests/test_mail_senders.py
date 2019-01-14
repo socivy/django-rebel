@@ -27,3 +27,6 @@ class TemplateMailSenderTestCase(TestCase):
         MailFactory.create(owner_object=owner_1, label=mail_label)
 
         self.assertListEqual([], mail_sender.get_available_owners())
+
+        mail_sender.send_once = False
+        self.assertListEqual([owner_1], mail_sender.get_available_owners())

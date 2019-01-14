@@ -120,7 +120,7 @@ class ProfileFilter(admin.SimpleListFilter):
 class MailAdmin(admin.ModelAdmin):
     list_display = ("id", "label", "owner_link", "email_to", "created_at", "tags", "profile",
                     "has_delivered", "has_opened", "has_clicked")
-    search_fields = ("email_from", "email_to", "tags", "content__subject", "label__name", "label__slug",)
+    search_fields = ("email_from__exact", "email_to__exact", "tags",)
     inlines = [EventInlineAdmin, MailContentInline]
     readonly_fields = ("message_id", "email_from", "email_to", "profile", "label", "tags",
                        "created_at", "has_delivered", "has_opened", "has_clicked", "storage_url")
