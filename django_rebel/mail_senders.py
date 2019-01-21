@@ -20,6 +20,7 @@ class TemplateMailSender:
     html_email_template_style_path = None
     subject_template_path = None
     tags = None
+    from_address = None
 
     # This field is for filtering owners by sent mails
     send_once = False
@@ -35,6 +36,9 @@ class TemplateMailSender:
             raise ValueError("Missing parameters")
 
         self.owners = owners
+
+    def get_from_address(self):
+        return self.from_address
 
     def get_subject_template_path(self):
         return self.subject_template_path
@@ -143,7 +147,8 @@ class TemplateMailSender:
         subject = self.get_subject_content()
         mail_sender = MailSender(self.email_profile, owners=self.get_available_owners())
 
-        mails = mail_sender.send(label=self.email_label,
+        mails = mail_sender.send(from_address=self.get_from_address(),
+                                 label=self.email_label,
                                  tags=self.tags,
                                  subject=subject,
                                  html=self.get_html_email_content(),
