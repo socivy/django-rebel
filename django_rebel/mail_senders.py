@@ -143,9 +143,15 @@ class TemplateMailSender:
 
         return available_owners
 
-    def send(self):
+    def send(self, force=False):
         subject = self.get_subject_content()
-        mail_sender = MailSender(self.email_profile, owners=self.get_available_owners())
+
+        if force:
+            owners = self.owners
+        else:
+            owners = self.get_available_owners()
+
+        mail_sender = MailSender(self.email_profile, owners=owners)
 
         mails = mail_sender.send(from_address=self.get_from_address(),
                                  label=self.email_label,

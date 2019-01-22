@@ -195,7 +195,7 @@ class SendMailAdminMixin:
     def generate_action(self, mail_sender):
         def send_mail_action(modeladmin, request, queryset):
             for obj in queryset.all():
-                mail_sender(obj).send()
+                mail_sender(obj).send(force=True)
 
             modeladmin.message_user(request, "Sent mails count: {count}".format(count=queryset.count()))
 
