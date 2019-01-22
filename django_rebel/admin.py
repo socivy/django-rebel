@@ -200,6 +200,7 @@ class SendMailAdminMixin:
             modeladmin.message_user(request, "Sent mails count: {count}".format(count=queryset.count()))
 
         send_mail_action.short_description = "Send '%s' mail" % mail_sender.email_label
+        send_mail_action.name = "send_%s_mail" % mail_sender.email_label
 
         return send_mail_action
 
@@ -217,7 +218,7 @@ class SendMailAdminMixin:
 
         for send_mail_action in self.get_send_mail_actions():
             actions.append(
-                (send_mail_action, send_mail_action.__name__, send_mail_action.short_description)
+                (send_mail_action, send_mail_action.name, send_mail_action.short_description)
             )
 
         return actions
