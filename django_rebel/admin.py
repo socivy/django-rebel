@@ -189,5 +189,39 @@ class MailLabelAdmin(admin.ModelAdmin):
     list_display = ("name", "slug")
 
 
+class SendMailAdminMixin:
+    mail_senders = []
+
+    def generate_action(self, mail_sender):
+        def send_mail_action(modeladmin, request, queryset):
+            for obj in queryset.all():
+                mail_sender(obj).send()
+
+            modeladmin.message_user(request, "Sent mails count: {count}".format(count=queryset.count()))
+
+        send_mail_action.short_description = "Send '%s' mail" % mail_sender.email_label
+
+        return send_mail_action
+
+    def get_send_mail_actions(self):
+        actions = []
+
+        for mail_sender in self.mail_senders:
+            actions.append(self.generate_action(mail_sender))
+
+        return actions
+
+    def _get_base_actions(self):
+        actions = super()._get_base_actions()
+        actions = list(actions)
+
+        for send_mail_action in self.get_send_mail_actions():
+            actions.append(
+                (send_mail_action, send_mail_action.__name__, send_mail_action.short_description)
+            )
+
+        return actions
+
+
 admin.site.register(Mail, MailAdmin)
 admin.site.register(MailLabel, MailLabelAdmin)
