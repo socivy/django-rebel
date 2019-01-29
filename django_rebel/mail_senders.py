@@ -110,6 +110,9 @@ class TemplateMailSender:
             'style_content': self.get_html_email_template_style_content()
         }
 
+    def get_tags(self):
+        return self.tags
+
     def get_variables(self):
         return {}
 
@@ -151,11 +154,11 @@ class TemplateMailSender:
         else:
             owners = self.get_available_owners()
 
-        mail_sender = MailSender(self.email_profile, owners=owners)
+        mail_sender = MailSender(self.get_email_profile(), owners=owners)
 
         mails = mail_sender.send(from_address=self.get_from_address(),
-                                 label=self.email_label,
-                                 tags=self.tags,
+                                 label=self.get_email_label(),
+                                 tags=self.get_tags(),
                                  subject=subject,
                                  html=self.get_html_email_content(),
                                  text=self.get_plain_email_content(),
