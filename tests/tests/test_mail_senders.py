@@ -1,10 +1,12 @@
 import json
-
 import re
-from django.test import TestCase
 
+import requests
 import httpretty
 
+from django.test import TestCase
+
+from django_rebel.exceptions import RebelConnectionError, RebelAPIError
 from django_rebel.mail_senders import TemplateMailSender
 from django_rebel.models import Mail
 
@@ -48,9 +50,28 @@ class TemplateMailSenderTestCase(TestCase):
 
         mail_sender = TestMailSender(owners=[owner_1])
 
+        httpretty.enable()
+
+        httpretty.register_uri(
+            httpretty.POST,
+            re.compile(r'.*'),
+            body="{}",
+            status=400
+        )
+
         status = mail_sender.send(fail_silently=True)
 
         self.assertFalse(status)
+
+        httpretty.register_uri(
+            httpretty.POST,
+            re.compile(r'.*'),
+            body="{}",
+            status=400
+        )
+
+        with self.assertRaises(RebelAPIError):
+            mail_sender.send(fail_silently=False)
 
     def test_send_mail(self):
         httpretty.enable()
@@ -69,3 +90,23 @@ class TemplateMailSenderTestCase(TestCase):
 
         self.assertEqual(Mail.objects.count(), 1)
         self.assertEqual(mails.__len__(), 1)
+
+    def test_connection_error(self):
+        owner_1 = OwnerFactory.create()
+
+        mail_sender = TestMailSender(owners=[owner_1])
+
+        httpretty.enable()
+
+        def connection_error(*args):
+            raise requests.ConnectionError()
+
+        httpretty.register_uri(
+            httpretty.POST,
+            re.compile(r'.*'),
+            body=connection_error,
+            status=400
+        )
+
+        with self.assertRaises(RebelConnectionError):
+            mail_sender.send(fail_silently=True)

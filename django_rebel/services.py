@@ -4,7 +4,7 @@ from requests.exceptions import ConnectionError
 
 from django.core import mail
 
-from django_rebel.exceptions import RebelAPIError
+from django_rebel.exceptions import RebelAPIError, RebelConnectionError
 from django_rebel.models import MailOwner, Mail, MailLabel
 
 
@@ -50,11 +50,13 @@ class MailSender:
 
         try:
             sent_mail_response = self.mailgun().message.send(**kwargs)
-        except (RebelAPIError, ConnectionError) as e:
+        except RebelAPIError as e:
             if fail_silently:
                 return False
 
             raise e
+        except ConnectionError:
+            raise RebelConnectionError()
         else:
             sent_mails = self._save_mails(from_address, sent_mail_response.message_id(), label, tags)
 

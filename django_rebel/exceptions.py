@@ -1,4 +1,4 @@
-from requests.exceptions import HTTPError, ConnectionError
+from requests.exceptions import HTTPError
 
 class RebelException(Exception):
     pass
@@ -10,5 +10,9 @@ class TargetMissing(RebelException):
     """
 
 
-class RebelAPIError(ConnectionError, HTTPError, RebelException):
+class RebelAPIError(HTTPError, RebelException):
+    pass
+
+
+class RebelConnectionError(RebelException):
     pass
