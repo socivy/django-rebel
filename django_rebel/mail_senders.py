@@ -146,7 +146,7 @@ class TemplateMailSender:
 
         return available_owners
 
-    def send(self, force=False):
+    def send(self, force=False, fail_silently=False):
         subject = self.get_subject_content()
 
         if force:
@@ -162,7 +162,8 @@ class TemplateMailSender:
                                  subject=subject,
                                  html=self.get_html_email_content(),
                                  text=self.get_plain_email_content(),
-                                 variables=self.get_variables())
+                                 variables=self.get_variables(),
+                                 fail_silently=fail_silently)
 
         return mails
 

@@ -57,7 +57,7 @@ REBEL = {
     "TEST_MODE": True,
     "SEARCH_FIELDS": [],
     "EMAIL_PROFILES": {
-        'MARKETING': {
+        'DEFAULT': {
             'EMAIL': "anyone@example.com",
             'FULL_NAME': 'Example Name',
             "API": {

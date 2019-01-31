@@ -1,5 +1,7 @@
 from typing import List
 
+from requests.exceptions import ConnectionError
+
 from django.core import mail
 
 from django_rebel.exceptions import RebelAPIError
@@ -48,7 +50,7 @@ class MailSender:
 
         try:
             sent_mail_response = self.mailgun().message.send(**kwargs)
-        except RebelAPIError as e:
+        except (RebelAPIError, ConnectionError) as e:
             if fail_silently:
                 return False
 
@@ -58,7 +60,7 @@ class MailSender:
 
             # mail.outbox += sent_mails
 
-        return True
+            return sent_mails
 
     def _save_mails(self, from_address, message_id, label_slug=None, tags=None):
         mails = []
