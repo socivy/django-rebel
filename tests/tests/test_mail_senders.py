@@ -1,5 +1,7 @@
 import json
 import re
+import urllib
+from urllib.parse import urlparse
 
 import requests
 import httpretty
@@ -110,3 +112,38 @@ class TemplateMailSenderTestCase(TestCase):
 
         with self.assertRaises(RebelConnectionError):
             mail_sender.send(fail_silently=True)
+
+    def test_send_once(self):
+        httpretty.enable()
+
+        httpretty.register_uri(
+            httpretty.POST,
+            re.compile(r'.*'),
+            body=json.dumps({"id": "foo"})
+        )
+
+        owner_1 = OwnerFactory.create()
+
+        mail_sender = TestMailSender(owners=[owner_1])
+
+        mails = mail_sender.send()
+
+        self.assertEqual(Mail.objects.count(), 1)
+
+        def second_request(request, uri, response_headers):
+            content = urllib.parse.parse_qs(request.body)
+
+            self.assertTrue("to" in content)
+
+            return [400, response_headers, "{}"]
+
+        httpretty.register_uri(
+            httpretty.POST,
+            re.compile(r'.*'),
+            body=second_request
+        )
+
+        mails = mail_sender.send()
+
+        self.assertFalse(mails)
+        self.assertEqual(Mail.objects.count(), 1)

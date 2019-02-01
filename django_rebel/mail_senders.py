@@ -152,7 +152,12 @@ class TemplateMailSender:
         if force:
             owners = self.owners
         else:
+            # If there is no one to send,
+            # Then return False
             owners = self.get_available_owners()
+
+            if len(owners) == 0:
+                return False
 
         mail_sender = MailSender(self.get_email_profile(), owners=owners)
 
