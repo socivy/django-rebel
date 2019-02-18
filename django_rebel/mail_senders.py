@@ -36,6 +36,8 @@ class TemplateMailSender:
             raise ValueError("Missing parameters")
 
         self.owners = owners
+        self.template_variables = self.get_template_variables()
+        self.variables = self.get_variables()
 
     def get_from_address(self):
         return self.from_address
@@ -83,25 +85,19 @@ class TemplateMailSender:
         if not self.has_html_email():
             return None
 
-        template_variables = self.get_template_variables()
-
-        html_email = loader.render_to_string(self.get_html_email_template_path(), template_variables)
+        html_email = loader.render_to_string(self.get_html_email_template_path(), self.template_variables)
 
         html_email = Premailer(html_email, cssutils_logging_level=logging.FATAL).transform()
 
         return html_email
 
     def get_plain_email_content(self):
-        template_variables = self.get_template_variables()
-
-        plain_email = loader.render_to_string(self.get_plain_email_template_path(), template_variables)
+        plain_email = loader.render_to_string(self.get_plain_email_template_path(), self.template_variables)
 
         return plain_email
 
     def get_subject_content(self):
-        template_variables = self.get_template_variables()
-
-        subject = loader.render_to_string(self.get_subject_template_path(), template_variables)
+        subject = loader.render_to_string(self.get_subject_template_path(), self.template_variables)
 
         return subject
 
@@ -115,6 +111,9 @@ class TemplateMailSender:
 
     def get_variables(self):
         return {}
+
+    def get_inline_files(self):
+        return []
 
     def get_available_owners(self):
         # This function is filtering owners by sent mails
@@ -167,7 +166,8 @@ class TemplateMailSender:
                                  subject=subject,
                                  html=self.get_html_email_content(),
                                  text=self.get_plain_email_content(),
-                                 variables=self.get_variables(),
+                                 files=self.get_inline_files(),
+                                 variables=self.variables,
                                  fail_silently=fail_silently)
 
         return mails
