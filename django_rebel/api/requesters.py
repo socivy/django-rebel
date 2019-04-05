@@ -1,10 +1,11 @@
 import json
+from json import JSONDecodeError
 from typing import Type
 
 import requests
 from requests import HTTPError
 
-from django_rebel.exceptions import TargetMissing, RebelAPIError
+from django_rebel.exceptions import TargetMissing, RebelAPIError, RebelNotValidAddress
 
 from .responses import Response, MessageResponses
 
@@ -23,6 +24,17 @@ class AbstractRequester:
         try:
             response.raise_for_status()
         except HTTPError as e:
+            try:
+                error_content = e.response.json()
+
+                if "message" in error_content.keys():
+                    if "is not a valid address" in error_content["message"]:
+                        raise RebelNotValidAddress(requests=e.request, response=e.response)
+            except JSONDecodeError:
+                """
+                If there is json decode error, then skip
+                """
+
             raise RebelAPIError(request=e.request, response=e.response)
 
         return response_class(base_response=response, base_request=prepared_request, mailgun=self.mailgun, **kwargs)

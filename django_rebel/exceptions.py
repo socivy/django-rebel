@@ -1,5 +1,6 @@
 from requests.exceptions import HTTPError
 
+
 class RebelException(Exception):
     pass
 
@@ -16,3 +17,9 @@ class RebelAPIError(HTTPError, RebelException):
 
 class RebelConnectionError(RebelException):
     pass
+
+
+class RebelNotValidAddress(RebelAPIError):
+    """
+    Raises when mailgun returns 'to', 'bcc' or 'cc' parameter is not valid
+    """
