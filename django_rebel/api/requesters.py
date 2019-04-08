@@ -29,7 +29,7 @@ class AbstractRequester:
 
                 if "message" in error_content.keys():
                     if "is not a valid address" in error_content["message"]:
-                        raise RebelNotValidAddress(requests=e.request, response=e.response)
+                        raise RebelNotValidAddress(request=e.request, response=e.response)
             except JSONDecodeError:
                 """
                 If there is json decode error, then skip
