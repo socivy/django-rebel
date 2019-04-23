@@ -158,6 +158,8 @@ class TemplateMailSender:
 
         mails = self.perform_send(owners, fail_silently)
 
+        self.after_send(mails)
+
         return mails
 
     def perform_send(self, owners, fail_silently=False):
@@ -174,6 +176,11 @@ class TemplateMailSender:
                                  fail_silently=fail_silently)
 
         return mails
+
+    def after_send(self, mails):
+        """
+        This method is helping for staging sending scenario
+        """
 
     def get_sent_mails(self):
         owner_query = None
