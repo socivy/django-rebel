@@ -156,6 +156,8 @@ class TemplateMailSender:
             if len(owners) == 0:
                 return False
 
+        self.before_send(owners)
+
         mails = self.perform_send(owners, fail_silently)
 
         self.after_send(mails)
@@ -178,6 +180,11 @@ class TemplateMailSender:
         return mails
 
     def after_send(self, mails):
+        """
+        This method is helping for staging sending scenario
+        """
+
+    def before_send(self, owners):
         """
         This method is helping for staging sending scenario
         """
