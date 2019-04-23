@@ -36,8 +36,16 @@ class TemplateMailSender:
             raise ValueError("Missing parameters")
 
         self.owners = owners
-        self.template_variables = self.get_template_variables()
         self.variables = self.get_variables()
+
+    @property
+    def template_variables(self):
+        # Do not calculate variables over and over again,
+        # Just cache it!
+        if hasattr(self, "_template_variables") is False:
+            setattr(self, "_template_variables", self.get_template_variables())
+
+        return self._template_variables
 
     def get_from_address(self):
         return self.from_address
