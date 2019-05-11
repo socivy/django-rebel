@@ -123,7 +123,7 @@ class TemplateMailSender:
     def get_inline_files(self):
         return []
 
-    def get_available_owners(self):
+    def get_available_owners_by_frequency(self):
         # This function is filtering owners by sent mails
 
         send_frequency = self.get_send_frequency()
@@ -152,6 +152,17 @@ class TemplateMailSender:
         available_owners = list(filter(is_available, self.owners))
 
         return available_owners
+
+    def get_available_owners(self, ):
+        owners = self.get_available_owners_by_frequency()
+
+        owners = self.validate_available_owners(owners)
+
+        return owners
+
+    def validate_available_owners(self, owners):
+        # This method is filtering for available owners
+        return owners
 
     def send(self, force=False, fail_silently=False):
         if force:
