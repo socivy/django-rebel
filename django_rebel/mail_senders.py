@@ -21,6 +21,7 @@ class TemplateMailSender:
     subject_template_path = None
     tags = None
     from_address = None
+    batch_mode = True
 
     # This field is for filtering owners by sent mails
     send_once = False
@@ -184,7 +185,7 @@ class TemplateMailSender:
         return mails
 
     def perform_send(self, owners, fail_silently=False):
-        mail_sender = MailSender(self.get_email_profile(), owners=owners, batch_mode=True)
+        mail_sender = MailSender(self.get_email_profile(), owners=owners, batch_mode=self.batch_mode)
 
         mails = mail_sender.send(from_address=self.get_from_address(),
                                  label=self.get_email_label(),
