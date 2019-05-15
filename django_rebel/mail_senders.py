@@ -184,7 +184,7 @@ class TemplateMailSender:
         return mails
 
     def perform_send(self, owners, fail_silently=False):
-        mail_sender = MailSender(self.get_email_profile(), owners=owners)
+        mail_sender = MailSender(self.get_email_profile(), owners=owners, batch_mode=True)
 
         mails = mail_sender.send(from_address=self.get_from_address(),
                                  label=self.get_email_label(),
