@@ -43,6 +43,12 @@ class EventView(View):
 
         event_data = data["event-data"]
 
+        # If there is no message area,
+        # Then we could not track mail status
+        # Because of that, return 404 error
+        if "message" not in event_data.keys():
+            raise Http404("Message area is not defined")
+
         message_headers = event_data["message"]["headers"]
 
         message_id = message_headers["message-id"]
