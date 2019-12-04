@@ -154,7 +154,10 @@ class TemplateMailSender:
 
         return available_owners
 
-    def get_available_owners(self, ):
+    def get_available_owners(self, force):
+        if force:
+            return self.owners
+
         owners = self.get_available_owners_by_frequency()
 
         owners = self.validate_available_owners(owners)
@@ -166,15 +169,12 @@ class TemplateMailSender:
         return owners
 
     def send(self, force=False, fail_silently=False):
-        if force:
-            owners = self.owners
-        else:
-            # If there is no one to send,
-            # Then return False
-            owners = self.get_available_owners()
+        # If there is no one to send,
+        # Then return False
+        owners = self.get_available_owners(force=force)
 
-            if len(owners) == 0:
-                return False
+        if len(owners) == 0:
+            return False
 
         self.before_send(owners)
 
