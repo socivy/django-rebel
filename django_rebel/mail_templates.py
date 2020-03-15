@@ -173,7 +173,8 @@ class DjangoMailTemplate:
         return mail
 
     def perform_send(self, fail_silently=False):
-        mail_sender = PreparedMail(from_address=self.get_from_address(),
+        mail_sender = PreparedMail(profile=self.get_email_profile(),
+                                   from_address=self.get_from_address(),
                                    label=self.get_email_label(),
                                    tags=self.get_tags(),
                                    subject=self.get_subject_content(),
