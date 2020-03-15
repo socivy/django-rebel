@@ -5,6 +5,8 @@ import django.contrib.postgres.fields.jsonb
 from django.db import migrations, models
 import django.db.models.deletion
 
+import django_rebel.models
+
 
 class Migration(migrations.Migration):
 
@@ -41,6 +43,9 @@ class Migration(migrations.Migration):
                 ('storage_url', models.URLField(blank=True, null=True)),
                 ('owner_id', models.PositiveIntegerField()),
                 ('tags', django.contrib.postgres.fields.ArrayField(base_field=models.CharField(max_length=64), blank=True, db_index=True, null=True, size=None)),
+            ],
+            managers=[
+                ('objects', django_rebel.models.MailManager()),
             ],
         ),
         migrations.CreateModel(

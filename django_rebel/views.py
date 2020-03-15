@@ -57,7 +57,7 @@ class EventView(View):
         try:
             mail = Mail.objects.get(message_id=message_id, email_to=recipient)
         except Mail.DoesNotExist:
-            return HttpResponse(content="Not found")
+            return Http404("Mail not found")
 
         storage = event_data.get("storage", None)
 
@@ -82,6 +82,10 @@ class EventView(View):
             }
 
         event.save()
+
+        event_field = "has_%s" % event_type.lower()
+        setattr(mail, event_field, True)
+        mail.save(update_fields=[event_field])
 
     def _generate_content(self, mail):
         storage_data = mail.get_storage()

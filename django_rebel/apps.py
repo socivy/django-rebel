@@ -2,4 +2,5 @@ from django.apps import AppConfig
 
 
 class RebelConfig(AppConfig):
-    name = 'rebel'
+    name = 'django_rebel'
+    verbose_name = "Rebel"

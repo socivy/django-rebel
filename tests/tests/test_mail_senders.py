@@ -9,13 +9,13 @@ import httpretty
 from django.test import TestCase
 
 from django_rebel.exceptions import RebelConnectionError, RebelAPIError
-from django_rebel.mail_senders import TemplateMailSender
+from django_rebel.mail_templates import DjangoMailTemplate
 from django_rebel.models import Mail
 
 from tests.factories import MailFactory, OwnerFactory, MailLabelFactory
 
 
-class TestMailSender(TemplateMailSender):
+class TestMailTemplate(DjangoMailTemplate):
     email_label = "test"
     subject_template_path = "subject.txt"
     plain_email_template_path = "content.html"
@@ -29,28 +29,27 @@ class TestMailSender(TemplateMailSender):
 
 
 class TemplateMailSenderTestCase(TestCase):
-    def test_get_available_owners(self):
+    def test_is_owner_available_by_frequency(self):
         owner_1 = OwnerFactory.create()
 
-        mail_sender = TestMailSender(owners=[owner_1])
-        self.assertListEqual([owner_1], mail_sender.get_available_owners())
+        mail_sender = TestMailTemplate(owner=owner_1)
+        self.assertTrue(mail_sender.is_owner_available_by_frequency())
 
         mail_label = MailLabelFactory.create(slug=mail_sender.get_email_label())
 
         MailFactory.create(label=mail_label)
-        self.assertListEqual([owner_1], mail_sender.get_available_owners())
+        self.assertTrue(mail_sender.is_owner_available_by_frequency())
 
         MailFactory.create(owner_object=owner_1, label=mail_label)
-
-        self.assertListEqual([], mail_sender.get_available_owners())
+        self.assertFalse(mail_sender.is_owner_available_by_frequency())
 
         mail_sender.send_once = False
-        self.assertListEqual([owner_1], mail_sender.get_available_owners())
+        self.assertTrue(mail_sender.is_owner_available_by_frequency())
 
     def test_fail_silently(self):
         owner_1 = OwnerFactory.create()
 
-        mail_sender = TestMailSender(owners=[owner_1])
+        mail_template = TestMailTemplate(owner_1)
 
         httpretty.enable()
 
@@ -61,7 +60,7 @@ class TemplateMailSenderTestCase(TestCase):
             status=400
         )
 
-        status = mail_sender.send(fail_silently=True)
+        status = mail_template.send(fail_silently=True)
 
         self.assertFalse(status)
 
@@ -73,7 +72,7 @@ class TemplateMailSenderTestCase(TestCase):
         )
 
         with self.assertRaises(RebelAPIError):
-            mail_sender.send(fail_silently=False)
+            mail_template.send(fail_silently=False)
 
     def test_send_mail(self):
         httpretty.enable()
@@ -86,17 +85,15 @@ class TemplateMailSenderTestCase(TestCase):
 
         owner_1 = OwnerFactory.create()
 
-        mail_sender = TestMailSender(owners=[owner_1])
-
-        mails = mail_sender.send()
+        mail_template = TestMailTemplate(owner_1)
+        mail_template.send()
 
         self.assertEqual(Mail.objects.count(), 1)
-        self.assertEqual(mails.__len__(), 1)
 
     def test_connection_error(self):
         owner_1 = OwnerFactory.create()
 
-        mail_sender = TestMailSender(owners=[owner_1])
+        mail_sender = TestMailTemplate(owner_1)
 
         httpretty.enable()
 
@@ -124,9 +121,8 @@ class TemplateMailSenderTestCase(TestCase):
 
         owner_1 = OwnerFactory.create()
 
-        mail_sender = TestMailSender(owners=[owner_1])
-
-        mails = mail_sender.send()
+        mail_sender = TestMailTemplate(owner_1)
+        mail_sender.send()
 
         self.assertEqual(Mail.objects.count(), 1)
 

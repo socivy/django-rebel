@@ -133,7 +133,9 @@ class MailAdmin(LargeListAdminMixin, admin.ModelAdmin):
     search_fields = ("email_from__exact", "email_to__exact",)
     inlines = [EventInlineAdmin, MailContentInline]
     readonly_fields = ("message_id", "email_from", "email_to", "profile", "label", "tags",
-                       "created_at", "has_delivered", "has_opened", "has_clicked", "storage_url")
+                       "created_at", "storage_url",
+                       "has_delivered", "has_opened", "has_clicked", "has_accepted", "has_rejected", "has_failed",
+                       "has_unsubscribed", "has_complained", "has_stored")
     exclude = ("owner_id", "owner_type")
     list_select_related = ("content", "label",)
     list_filter = [ProfileFilter, MailLabelFilter, HasDeliveredEventFilter, HasOpenedEventFilter, HasClickedEventFilter]
@@ -146,21 +148,6 @@ class MailAdmin(LargeListAdminMixin, admin.ModelAdmin):
             return obj.content.subject
 
         return "-"
-
-    def has_delivered(self, obj: Mail):
-        return _boolean_icon(obj.has_delivered)
-
-    has_delivered.admin_order_field = "has_delivered"
-
-    def has_opened(self, obj: Mail):
-        return _boolean_icon(obj.has_opened)
-
-    has_opened.admin_order_field = "has_opened"
-
-    def has_clicked(self, obj: Mail):
-        return _boolean_icon(obj.has_clicked)
-
-    has_clicked.admin_order_field = "has_clicked"
 
     def owner_link(self, obj: Mail):
         if obj.owner_object:
@@ -182,6 +169,12 @@ class MailAdmin(LargeListAdminMixin, admin.ModelAdmin):
         fields = list(fields) + settings.REBEL["SEARCH_FIELDS"]
 
         return fields
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
 
 
 class MailLabelAdmin(admin.ModelAdmin):

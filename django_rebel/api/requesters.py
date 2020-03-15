@@ -42,7 +42,7 @@ class AbstractRequester:
 
 class Message(AbstractRequester):
     def send(self, subject: str, from_address: str = None, to=None, bcc=None, cc=None, text=None, html=None,
-             variables=None, tags: list = None, test_mode: bool = None, files: list = None):
+             variables=None, tags: list = None, test_mode: bool = None, inlines: list = None, attachments: list = None):
 
         if to is None and bcc is None and cc is None:
             raise TargetMissing()
@@ -83,8 +83,13 @@ class Message(AbstractRequester):
 
         sent_mails = to + cc + bcc
 
-        if files:
-            files = [('inline', _f) for _f in files]
+        files = []
+
+        if inlines:
+            files = [('inline', _f) for _f in inlines]
+
+        if attachments:
+            files = [('attachment', _f) for _f in attachments]
 
         req = self.mailgun.client().prepare_request("messages", method="post", data=data, files=files)
 

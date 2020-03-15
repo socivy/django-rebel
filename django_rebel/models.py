@@ -1,10 +1,9 @@
 import requests
-
-from django.db import models
 from django.conf import settings
-from django.contrib.postgres.fields import ArrayField, JSONField
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import ArrayField, JSONField
+from django.db import models
 from django.urls import reverse
 
 from django_rebel.api.constants import EVENT_TYPES
@@ -27,12 +26,21 @@ class MailLabel(TimeBasedModel):
 
 
 class MailQuerySet(models.QuerySet):
+    use_in_migrations = True
+
     def with_event_status(self):
         return self.annotate(
-            has_opened=models.Exists(Event.objects.filter(mail=models.OuterRef("id"), name=EVENT_TYPES.OPENED)),
-            has_delivered=models.Exists(Event.objects.filter(mail=models.OuterRef("id"), name=EVENT_TYPES.DELIVERED)),
-            has_clicked=models.Exists(Event.objects.filter(mail=models.OuterRef("id"), name=EVENT_TYPES.CLICKED)),
+            calculated_has_opened=models.Exists(
+                Event.objects.filter(mail=models.OuterRef("id"), name=EVENT_TYPES.OPENED)),
+            calculated_has_delivered=models.Exists(
+                Event.objects.filter(mail=models.OuterRef("id"), name=EVENT_TYPES.DELIVERED)),
+            calculated_has_clicked=models.Exists(
+                Event.objects.filter(mail=models.OuterRef("id"), name=EVENT_TYPES.CLICKED)),
         )
+
+
+class MailManager(models.Manager.from_queryset(MailQuerySet)):
+    use_in_migrations = True
 
 
 class Mail(TimeBasedModel):
@@ -44,8 +52,11 @@ class Mail(TimeBasedModel):
 
     storage_url = models.URLField(null=True, blank=True)
 
-    owner_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    owner_id = models.PositiveIntegerField()
+    owner_type = models.ForeignKey(ContentType,
+                                   on_delete=models.SET_NULL,
+                                   null=True,
+                                   blank=True)
+    owner_id = models.PositiveIntegerField(null=True, blank=True)
     owner_object = GenericForeignKey('owner_type', 'owner_id')
 
     label = models.ForeignKey(MailLabel, null=True, blank=True, on_delete=models.CASCADE)
@@ -55,7 +66,17 @@ class Mail(TimeBasedModel):
         db_index=True
     )
 
-    objects = MailQuerySet.as_manager()
+    has_accepted = models.BooleanField(default=False)
+    has_rejected = models.BooleanField(default=False)
+    has_delivered = models.BooleanField(default=False)
+    has_failed = models.BooleanField(default=False)
+    has_opened = models.BooleanField(default=False)
+    has_clicked = models.BooleanField(default=False)
+    has_unsubscribed = models.BooleanField(default=False)
+    has_complained = models.BooleanField(default=False)
+    has_stored = models.BooleanField(default=False)
+
+    objects = MailManager()
 
     class Meta:
         unique_together = ("email_to", "message_id")
@@ -115,7 +136,9 @@ class MailOwner(models.Model):
         raise NotImplementedError()
 
     def get_admin_view_link(self):
-        raise NotImplementedError()
+        url = reverse('admin:%s_%s_change' % (self._meta.app_label, self._meta.model_name), args=[self.id])
+
+        return url
 
     class Meta:
         abstract = True

@@ -1,10 +1,10 @@
 from typing import Type
 
-from django_rebel.mail_senders import TemplateMailSender
+from django_rebel.mail_templates import DjangoMailTemplate
 
 
 class MailSentGroup:
-    template_mail_sender: Type[TemplateMailSender] = None
+    template_mail_sender: Type[DjangoMailTemplate] = None
     single_send_mode = True
 
     def get_mail_owners(self):

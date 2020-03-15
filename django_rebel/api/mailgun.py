@@ -1,7 +1,7 @@
-from django.conf import settings
+from django_rebel.settings import get_settings, get_profile_settings
 
 from .client import Client
-from. requesters import Message, Event
+from .requesters import Message, Event
 
 
 class Mailgun:
@@ -13,11 +13,11 @@ class Mailgun:
 
     @property
     def profile_settings(self):
-        return self.settings["EMAIL_PROFILES"][self.profile]
+        return get_profile_settings(self.profile)
 
     @property
     def settings(self):
-        return settings.REBEL
+        return get_settings()
 
     def client(self):
         return Client(self)
