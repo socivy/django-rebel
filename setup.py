@@ -4,10 +4,13 @@ See:
 https://packaging.python.org/en/latest/distributing.html
 https://github.com/pypa/sampleproject
 """
+import pathlib
 import shutil
 import sys
 
 import re
+
+import pkg_resources
 from setuptools import setup, find_packages
 from codecs import open
 from os import path
@@ -26,11 +29,13 @@ def get_requirements(requirements_file):
     """Use pip to parse requirements file."""
     requirements = []
     if path.isfile(requirements_file):
-        for req in parse_requirements(requirements_file, session="hack"):
-            if req.markers:
-                requirements.append("%s;%s" % (req.req, req.markers))
-            else:
-                requirements.append("%s" % req.req)
+        with pathlib.Path(requirements_file).open() as requirements_txt:
+            install_requires = [
+                str(requirement)
+                for requirement
+                in pkg_resources.parse_requirements(requirements_txt)
+            ]
+            requirements += install_requires
     return requirements
 
 
