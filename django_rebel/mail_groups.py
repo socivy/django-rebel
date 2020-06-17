@@ -16,15 +16,12 @@ class MailSentGroup:
         if count is not None:
             mail_owners = mail_owners[:count]
 
-        if self.single_send_mode:
-            mails = []
+        mails = []
 
-            for mail_owner in mail_owners:
-                mail = self.template_mail_sender(mail_owner).send(force=force)
+        for mail_owner in mail_owners:
+            mail = self.template_mail_sender(mail_owner).send(force=force)
 
-                if mail:
-                    mails.append(mail[0])
-        else:
-            mails = self.template_mail_sender(mail_owners).send(force=force)
+            if mail:
+                mails.append(mail)
 
         return mails
