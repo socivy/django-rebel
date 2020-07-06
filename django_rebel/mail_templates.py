@@ -29,6 +29,8 @@ class DjangoMailTemplate:
     # This is filter field for filtering owner
     send_frequency = 0
 
+    fail_silently = False
+
     def __init__(self, owner):
         if self.get_subject_template_path() is None or \
                 self.get_plain_email_template_path() is None or \
@@ -275,10 +277,12 @@ class BatchTemplateMailSender(DjangoMailTemplate):
         # This method is filtering for available owner
         return owners
 
-    def send(self, force=False, fail_silently=False, variables=None, template_variables=None):
+    def send(self, force=False, fail_silently=None, variables=None, template_variables=None):
         # If there is no one to send,
         # Then return False
         owners = self.get_available_owners(force=force)
+
+        fail_silently = fail_silently if fail_silently is not None else self.fail_silently
 
         if len(owners) == 0:
             return False
