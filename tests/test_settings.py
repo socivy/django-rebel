@@ -39,10 +39,10 @@ MIDDLEWARE = (
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'django_rebel',
-        'USER': 'django_rebel',
-        'PASSWORD': 'django_rebel',
-        'HOST': '127.0.0.1',
+        'NAME': 'db',
+        'USER': 'user',
+        'PASSWORD': 'password',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }
