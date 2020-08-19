@@ -10,7 +10,7 @@ class MailSentGroup:
     def get_mail_owners(self):
         raise NotImplementedError()
 
-    def send_new_mails(self, count=None, force=False):
+    def send_new_mails(self, count=None, force=False, fail_silently=False):
         mail_owners = self.get_mail_owners()
 
         if count is not None:
@@ -19,7 +19,7 @@ class MailSentGroup:
         mails = []
 
         for mail_owner in mail_owners:
-            mail = self.template_mail_sender(mail_owner).send(force=force)
+            mail = self.template_mail_sender(mail_owner).send(force=force, fail_silently=fail_silently)
 
             if mail:
                 mails.append(mail)
