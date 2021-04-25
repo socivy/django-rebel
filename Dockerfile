@@ -7,15 +7,9 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-RUN apt-get update && apt-get install -y postgresql-client \
+RUN apt-get update && apt-get install -y \
     gcc \
-    python3-dev \
-    musl-dev \
-    zlib1g-dev \
-    libmediainfo-dev \
-    ffmpeg \
-    gettext \
-    cron
+    python3-dev
 
 COPY requirements.txt requirements.txt
 COPY requirements requirements

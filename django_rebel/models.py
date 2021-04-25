@@ -2,7 +2,7 @@ import requests
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.fields import ArrayField, JSONField
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.urls import reverse
 
@@ -110,7 +110,7 @@ class Event(TimeBasedModel):
 
     name = models.CharField(max_length=32, choices=EVENT_NAMES)
 
-    extra_data = JSONField(null=True, blank=True)
+    extra_data = models.JSONField(null=True, blank=True)
 
     def __str__(self):
         return "%s Event: %s" % (self.mail.__str__(), self.name)
