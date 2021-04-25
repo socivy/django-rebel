@@ -165,6 +165,8 @@ class DjangoMailTemplate:
 
         mails, status = self.perform_send(fail_silently)
 
+        self.finally_send(mails, status)
+
         if status is False:
             return False
 
@@ -193,6 +195,11 @@ class DjangoMailTemplate:
     def after_send(self, mails):
         """
         This method is helping for staging sending scenario
+        """
+
+    def finally_send(self, mails: list, status: bool):
+        """
+        This method is triggered after sending mail with any status
         """
 
     def before_send(self, owners):
